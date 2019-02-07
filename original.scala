@@ -1,36 +1,114 @@
-//Latest without any error
+//Latest1 without any error
 
 import scala.io.Source
-import io.Source._
 import java.io._
 import scala.collection.mutable.ListBuffer
 import java.io.PrintWriter
 import java.io.FileReader
+import org.apache.spark.sql.SQLContext
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.{SparkConf, SparkContext}
+import org.apache.spark
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.{DataTypes, StructField, StructType}
+import org.apache.spark.sql._
+import org.apache.spark.{SparkConf, SparkContext}
+import java.io.File
+import scala.io.Source._
+import org.apache.spark.sql.SparkSession
 
 
 
-object Newobj {
+
+object scaleobj {
   
+  private var localFilePath: File = new File(/*properties*/)
+  private var dfsDirPath: String = ""
+
+  private val NPARAMS = 2   //setting the number of parameters
+
+  case class data1(id:Int,name:String,age:Int,date:String)
+
+
+  private def readSrcFile(filename: String ): List[String] = {
+    val lineIter: Iterator[String] =fromFile(filename).getLines()
+    val lineList: List[String] = lineIter.toList
+    lineList
+}
   
 
+  private def parseArgs(args: Array[String]): Unit = {
+    if (args.length != NPARAMS) {
+      System.err.println("Expected args Parameters not found")
+      System.exit(1)
+    }
 
-case class data1(id:Int,name:String,age:Int,date:String)
+    var i = 0
+
+    localFilePath = new File(args(i))
+    if (!localFilePath.exists) {
+      System.err.println(s"Given path (${args(i)}) does not exist")
+   
+      System.exit(1)
+    }
+
+    if (!localFilePath.isFile) {
+      System.err.println(s"Given path (${args(i)}) is not a file")
+     // printUsage()
+      System.exit(1)
+    }
+
+    i += 1
+    dfsDirPath = args(i)
+  }
+  
+   
+  
+  def mappingSourceFile(fileContents: List[String]): List[data1] = {
+    
+	val src_fil= fileContents.map(f=> data1( f.split(",")(0).toInt, f.split(",")(1), 
+				    f.split(",")(2).toInt, f.split(",")(3))).toList
+	     src_fil
+  }
+    
+   
+    
+    
+  
 
 def main(args: Array[String]): Unit = {
   
+    println("Validating arguments")
+    parseArgs(args)
+    val fileContents = readSrcFile(localFilePath.toString()) //
+    val structSrcFileList = mappingSourceFile(fileContents)
+
+    println("Creating SparkSession")
+    val spark = SparkSession
+      .builder
+      .appName("DFS Read Write Test")
+      .getOrCreate()
+      
+
+
 
 var listbuff = new ListBuffer [String] ()
 
 var dirlistbuff = new ListBuffer [String] ()
 
-		val hive_table_directory = "C:\\Users\\TR20064147\\Desktop\\eclipse\\readme"
+var dirlistbuff2 = new ListBuffer [String] ()
+
+var hive_data_buffer = new ListBuffer [data1] ()
+
+
+		val hive_table_directory = "C:\\Users\\tamilselvan\\Documents\\ramesh\\ram"
 
 				val d = new File(hive_table_directory)
 				println("Ramesh")
 
 				println(d.isDirectory)
 
-				val src_file_Text  = Source.fromResource("Book1.csv").getLines()
+			//	val src_file_Text  = Source.fromResource("Book2.csv").getLines()
 
 				val src_fil= src_file_Text.map(f=> data1( f.split(",")(0).toInt, f.split(",")(1), 
 				    f.split(",")(2).toInt, f.split(",")(3))).toList
@@ -66,7 +144,6 @@ var dirlistbuff = new ListBuffer [String] ()
 				val n = i.date.substring(0, 10)
 
 						println(i.date.substring(0, 10))
-						println("print n " + n + "print J "+j )
 
 						if (  j.equals(n)) {
 							val valid_directy =  new File(hive_table_directory + "\\" + j )   
@@ -80,7 +157,7 @@ var dirlistbuff = new ListBuffer [String] ()
 										val dirfiles = valid_directy.listFiles()
 												println("inside directory")
 
-                var dirlistbuff2 = new ListBuffer [String] ()
+
 												//getting the list of files in the hive directory
 												for (q <- dirfiles)
 												{
@@ -98,7 +175,6 @@ var dirlistbuff = new ListBuffer [String] ()
 
 
 										//iterating the files one by one 
-					   	var hive_data_buffer = new ListBuffer [data1] ()				
 
 										for (k <- dirlistbuff2)
 										{
@@ -108,81 +184,70 @@ var dirlistbuff = new ListBuffer [String] ()
 													val opening_the_file = Source.fromFile(filepath).getLines
 
 													//opening_the_file.foreach(println)  
-													val  alligned_hive_file1 :List[data1] = opening_the_file.map(f=> data1( f.split(",")(0).toInt, f.split(",")(1),f.split(",")(2).toInt, f.split(",")(3))).toList
-													//  hive_data_buffer = hive_data_buffer :: alligned_hive_file
-														//	hive_data_buffer += alligned_hive_file1.toString()
-											    	hive_data_buffer ++ alligned_hive_file1
-													
-										}
-									val hiv_file_data= hive_data_buffer.toList
+													val alligned_hive_file= 
+													  opening_the_file.map(f=> data1( f.split(",")(0).toInt, f.split(",")(1).toString(), 
+															f.split(",")(2).toInt, f.split(",")(3).toString())).toList
 
-               
+													  hive_data_buffer += alligned_hive_file
+													//file_data_buffer += alligned_hive_file_list.
+													//
+										}
+								//	val hiv_file_data= hive_data_buffer.toList
+
+
+
+
+
 												//comparing the i data with the 
 									
-									      val source_file_unique_data = i.id+i.name+i.age
+									val source_file_unique_data = i.id+i.name+i.age
 
-								  	    var found_bit=0
-								  	    
 													for ( hive_file <- hiv_file_data )  {
-													  
-													  val hive_file_unique_data =hive_file.id+hive_file.name+hive_file.age
-													  
+													  val hive_file_unique_data = hive_file.
 														println("inside for loop 2")
-														if (hive_file_unique_data == source_file_unique_data)
+														if (hive_file == source_file_unique_data)
 
 														{ 
-														  
-															listbuff+= source_file_unique_data
-															found_bit +=1
+															listbuff+= hive_file
+																	println("listbuff")
+
+														}
+
+														else
+
+														{
+															println("creating an new directory")
+
+															for (   source_file <- src_fil){
+																val new_dir_name = source_file.id+ source_file.name+source_file.age+source_file.date
+
+																		if (new_dir_name == hive_file)
+
+
+																			//val new_dir_name = source_file.date.substring(0, 10)
+																			val newfile = new File(valid_directy + "//"+ new_dir_name)
+																			println(newfile)
+																			newfile.createNewFile()
+																			val w = new PrintWriter(newfile)
+																			w.write(source_file.id + "," + source_file.name + "," + source_file.age + "," + source_file.date)
+																			w.close()
+															}
 														}
 
 													}
-									
-									        if (found_bit==0)
-									        {
-									          
-									       // val dir = new File(hive_table_directory + "//"+ n)
-									        //dir.mkdir()
-													println("inside file creation")
-													val newfile = new File(hive_table_directory +"//"+ n+"//"+ source_file_unique_data)
-													println("newfile"+newfile)
-													newfile.createNewFile()
-													val w = new PrintWriter(newfile)
-													w.write(i.id + "," + i.name + "," + i.age + "," + i.date)
-													w.close()
-									        }
-									
-									
-												}
 
+		
+
+										// }
 
 									}
-				
-						else
-						{
-						  
-				  val dir = new File(hive_table_directory + "//"+ n)
-					dir.mkdir()
-					println("directory created"+dir)
-				  val newfile1 = new File(dir + "//"+ i.id+ i.name + + i.age )
-					println(newfile1)
-					newfile1.createNewFile()
-					val w = new PrintWriter(newfile1)
-					w.write(i.id + "," + i.name + "," + i.age + "," + i.date)
-					w.close()
-				 
-						  
-						  
-						  
-						}
-				
-				
 						}
 
 			}
-	
+		}
 		println("printing list buffer")
 		listbuff.foreach(println)
-}
 
 	}
+
+}
