@@ -1,4 +1,4 @@
-
+//Latest without any error
 
 import scala.io.Source
 import io.Source._
@@ -12,11 +12,7 @@ import java.io.FileReader
 object Newobj {
   
   
-  
-  
-  
-  
-  
+
 
 case class data1(id:Int,name:String,age:Int,date:String)
 
