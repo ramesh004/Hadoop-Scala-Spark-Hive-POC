@@ -1,3 +1,5 @@
+
+
 package demopack
 
 import org.apache.spark.sql.SparkSession
@@ -291,12 +293,8 @@ import org.apache.hadoop.util.ToolRunner;
 					println("sourcePartition=>"+sourcePartition )
 
 						if (j.equals(sourcePartition)) {
-							
-						     // hivepath has to add************
-
-
-									
-									if ( isDirExist(navigatingPath))
+	
+						  if ( isDirExist(navigatingPath))
 									{
 									  val addingKeyInHiveFiles= addingUniqueKey(hiveTabledir,j )
 									  val addingPartKeyInHiveFiles = addingPartitionKey(addingKeyInHiveFiles)
@@ -364,7 +362,7 @@ import org.apache.hadoop.util.ToolRunner;
   }			
 						  
 	  
-object demo {
+object scalaobj {
 
   println ("Initializing spark new")
   
@@ -377,34 +375,18 @@ object demo {
               .master("local").config("spark.sql.shuffle.partitions", "5")
               .appName("hivedir")
               .getOrCreate()
-
-
               val sc = new cls(spark)
-              
-                          
               val sourceSystem ="cloudera"
               val sourceFeed = "sourceFeed"
               val hiveTableDirectory= "hdfs://quickstart.cloudera:8020/user/cloudera/dir/retailer"
-             
-              
               val addingUniqkey = sc.addingUniqueKey( sc.defaultDir+sourceSystem, sourceFeed)
-              
              // addingUniqkey.show()
-              
-              
-             val addingPartKey = sc.addingPartitionKey(addingUniqkey)
-             
-              //addingPartKey.show()
-             
+              val addingPartKey = sc.addingPartitionKey(addingUniqkey)
+             //addingPartKey.show()
              val WithUniqPartList= sc.dfToList(addingPartKey)
-            
-            
-            
              val hiveDirList= sc.listOfHivedir(hiveTableDirectory)
-          
-             println("hivedirfiles")
+              println("hivedirfiles")
              hiveDirList.foreach(println)
-           
            sc.processing(addingUniqkey,WithUniqPartList,hiveDirList,hiveTableDirectory,sourceSystem,sourceFeed)
           //    println ("Printing the array")
 
