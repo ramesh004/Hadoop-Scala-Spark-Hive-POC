@@ -19,11 +19,6 @@ object Demo {
 }
 
 
-
-
-
-
-
 import scala.io.Source
 import java.io._
 import scala.collection.mutable.ListBuffer
@@ -115,9 +110,6 @@ def main(args: Array[String]): Unit = {
       .appName("DFS Read Write Test")
       .getOrCreate()
       
-
-
-
 var listbuff = new ListBuffer [String] ()
 
 var dirlistbuff = new ListBuffer [String] ()
@@ -281,31 +273,8 @@ var hive_data_buffer = new ListBuffer [data1] ()
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /home/cloudera/eclipse-workspace1/new_proj/target/new_proj-0.0.1-SNAPSHOT.jar
 /home/cloudera/eclipse-workspace1/new_proj/target/new_proj-0.0.1-SNAPSHOT.jar
-
-
-
-
-
-
-
-
-
 
 
 val lol =FileSystem.get( sc.hadoopConfiguration ).listStatus( 
@@ -313,15 +282,6 @@ val lol =FileSystem.get( sc.hadoopConfiguration ).listStatus(
 new Path("/FileStore/tables/")
 
 ).foreach( x => x.getPath.toString )
-
-
-
-
-
-
-
-
-
 
 
 
